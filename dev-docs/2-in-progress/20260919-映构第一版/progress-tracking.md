@@ -13,5 +13,7 @@
 - `corepack pnpm build`：通过，含 TypeScript 检查。
 - `bash ./mvnw -B -Dtest=CharacterImageHistoryTests package`（JDK 21）：通过，测试 2/2，已生成后端 JAR。
 - `corepack pnpm test:characters`：桌面和手机合计 12/12 通过；使用隔离的模拟 API，不代表真实模型生成已验收。
-- 火山引擎：CLI 尚未登录，已发起控制台授权；目标实例、区域和连接方式待授权后查询。
+- 代码已提交并推送至 `origin/feat/yinggou-v1`，功能提交为 `90350cb`。
+- GitHub Actions：[运行 35372696089](https://github.com/awiggy/yinggou-studio/actions/runs/35372696089) 全部通过，覆盖后端测试、Docker Compose 配置校验、前端检查与构建，以及桌面和手机浏览器验收。
+- 火山引擎：控制台授权成功；默认北京区域未查到 ECS 实例，待用户提供服务器区域、实例名称或详情页链接后继续定位。
 - 未完成：云端实际启动、Flyway validate、管理员初始化及真实模型生图验收。
