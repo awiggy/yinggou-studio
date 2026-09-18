@@ -26,7 +26,7 @@
 
 ## 云端部署
 
-本项目仓库属于 [awiggy](https://github.com/awiggy)，部署目标为用户已有的火山引擎云服务器。
+本项目仓库属于 [awiggy](https://github.com/awiggy)，计划部署到火山引擎华北2（北京）。当前提供的是 ECS 等 Linux 服务器使用的 Docker Compose 配置；veFaaS 需要单独适配运行环境和持久化依赖。
 
 参见 [映构部署说明](deploy/yinggou/README.md)。源码由你自己的 GitHub 仓库管理，服务运行在云服务器；无需在个人电脑常驻运行。
 
