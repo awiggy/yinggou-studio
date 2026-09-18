@@ -1,0 +1,77 @@
+name: Yinggou deployment bundle
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/yinggou-v1]
+    paths:
+      - '.github/workflows/yinggou-images.yml'
+      - 'deploy/yinggou/compose.yaml'
+      - 'deploy/yinggou/low-memory.yaml'
+      - 'deploy/yinggou/smoke-check.sh'
+      - 'deploy/yinggou/install-bundle.sh'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yinggou-images-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-check:
+    if: github.repository == 'awiggy/yinggou-studio'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      BACKEND_IMAGE: yinggou-backend:${{ github.sha }}
+      FRONTEND_IMAGE: yinggou-frontend:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: ai-fusion-video/pom.xml
+      - name: Package backend
+        working-directory: ai-fusion-video
+        run: |
+          bash ./mvnw -B -Dtest=CharacterImageHistoryTests package
+          cp target/ai-fusion-video-1.1.2.jar docker-build/app.jar
+      - name: Build Linux amd64 images
+        run: |
+          docker build --platform linux/amd64 -t "$BACKEND_IMAGE" ai-fusion-video/docker-build
+          docker build --platform linux/amd64 -t "$FRONTEND_IMAGE" ai-fusion-video-web
+      - name: Check complete stack with memory limits
+        run: |
+          bash deploy/yinggou/init-env.sh
+          bash deploy/yinggou/smoke-check.sh
+      - name: Collect diagnostics
+        if: always()
+        run: |
+          mkdir -p bundle
+          docker compose --env-file deploy/yinggou/.env -f deploy/yinggou/compose.yaml -f deploy/yinggou/low-memory.yaml ps -a > bundle/containers.txt
+          docker stats --no-stream --format '{{.Name}}\t{{.MemUsage}}\t{{.CPUPerc}}' > bundle/memory.txt
+          docker compose --env-file deploy/yinggou/.env -f deploy/yinggou/compose.yaml -f deploy/yinggou/low-memory.yaml logs --no-color --tail 250 > bundle/startup.log
+      - name: Export verified deployment bundle
+        run: |
+          mkdir -p bundle/deploy/yinggou bundle/docker/nginx
+          docker image save "$BACKEND_IMAGE" "$FRONTEND_IMAGE" mysql:8.0 redis:7-alpine nginx:alpine | gzip -1 > bundle/images.tar.gz
+          cp deploy/yinggou/{compose.yaml,low-memory.yaml,init-env.sh,install-bundle.sh} bundle/deploy/yinggou/
+          cp docker/nginx/default.conf bundle/docker/nginx/
+          printf 'BACKEND_IMAGE=%s\nFRONTEND_IMAGE=%s\n' "$BACKEND_IMAGE" "$FRONTEND_IMAGE" > bundle/images.env
+          printf '%s\n' "$GITHUB_SHA" > bundle/COMMIT
+          cd bundle
+          sha256sum images.tar.gz > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yinggou-linux-amd64
+          path: bundle/
+          include-hidden-files: false
+          compression-level: 0
+          retention-days: 1
+      - name: Clean up disposable runner containers
+        if: always()
+        run: docker compose --env-file deploy/yinggou/.env -f deploy/yinggou/compose.yaml -f deploy/yinggou/low-memory.yaml down

@@ -3,4 +3,8 @@ target/
 .gitignore
 .mvn/repository/
 *.md
+.env*
+data/
+logs/
+.vefaas/
 docker-compose*.yaml

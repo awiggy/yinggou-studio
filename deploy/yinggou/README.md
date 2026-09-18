@@ -6,6 +6,24 @@
 
 ## 首次部署
 
+### 使用 GitHub 构建包（服务器无需编译）
+
+运行 GitHub Actions 的 `Yinggou deployment bundle` 工作流。工作流在 Linux x86_64 上构建前后端镜像，实际启动 MySQL、Redis、后端、前端和 Nginx，检查数据库迁移与页面，再导出五个服务的镜像和部署配置。
+
+成功后下载 `yinggou-linux-amd64` artifact，解压到服务器独立目录，运行：
+
+```bash
+bash deploy/yinggou/install-bundle.sh
+```
+
+服务器需已安装 Docker Engine 和 Docker Compose v2。安装脚本验证镜像包校验和，导入本地镜像，以 `--no-build --pull never` 启动。密码在服务器首次运行时生成，已有 `.env` 会保留；GitHub 测试用密码不会打入部署包。默认监听 `127.0.0.1:8080`，按下文 SSH 转发完成初始化。打包产物仅保留 1 天，过期可重新构建；下载后请自行保留已验收版本用于恢复。
+
+`low-memory.yaml` 为单人试用设置容器内存上限，合计约 3.19 GiB；4 GB 服务器仍需给操作系统和 Docker 留空间。启动检查与空闲内存数据不代表生图、Agent 或视频合成负载已经验收，不保证 2 GB 服务器能运行完整服务。模型调用仍由配置的外部服务承担。
+
+`COMMIT` 记录源码版本，`memory.txt` 和 `startup.log` 记录 GitHub 上的启动验证信息。此部署包不包含 HTTPS 代理镜像；正式公网访问需再配置入口。
+
+### 在服务器从源码构建
+
 ```bash
 git clone --branch feat/yinggou-v1 https://github.com/awiggy/yinggou-studio.git
 cd yinggou-studio

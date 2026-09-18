@@ -32,6 +32,7 @@ services:
       timeout: 5s
       retries: 10
   backend:
+    image: ${BACKEND_IMAGE:-yinggou-backend:local}
     build:
       context: ../../ai-fusion-video
     restart: unless-stopped
@@ -64,6 +65,7 @@ services:
       timeout: 5s
       retries: 20
   frontend:
+    image: ${FRONTEND_IMAGE:-yinggou-frontend:local}
     build:
       context: ../../ai-fusion-video-web
     restart: unless-stopped

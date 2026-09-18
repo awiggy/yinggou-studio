@@ -1,0 +1,17 @@
+# 单人试用的运行上限；须搭配 compose.yaml，不用于服务器端编译。
+services:
+  mysql:
+    mem_limit: 1024m
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-time-zone=+08:00 --innodb-buffer-pool-size=128M --max-connections=50
+  redis:
+    mem_limit: 128m
+  backend:
+    mem_limit: 1536m
+    environment:
+      JAVA_TOOL_OPTIONS: -Xms128m -Xmx768m
+  frontend:
+    mem_limit: 512m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=256
+  nginx:
+    mem_limit: 64m
