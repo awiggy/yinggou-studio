@@ -46,7 +46,7 @@ export async function confirmCharacterImage(
   image: ImageGenerationItem,
   prompt: string,
 ) {
-  if (image.status !== 2 || !image.imageUrl)
+  if (image.status !== 1 || !image.imageUrl)
     throw new Error("图片尚未生成完成");
   const [asset, items] = await Promise.all([
     assetApi.get(assetId),

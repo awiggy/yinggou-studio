@@ -60,7 +60,7 @@ export function CharacterImageHistory({
           )}
           <div className="grid gap-4 sm:grid-cols-2">
             {items.map((item) =>
-              item.imageUrl && item.status === 2 ? (
+              item.imageUrl && item.status === 1 ? (
                 <div key={item.id} className="min-w-0 space-y-3">
                   <a
                     href={resolveMediaUrl(item.imageUrl) ?? undefined}
@@ -100,13 +100,16 @@ export function CharacterImageHistory({
                   key={item.id}
                   className="flex aspect-square flex-col items-center justify-center gap-3 rounded-lg bg-muted/40 p-4 text-center text-sm text-muted-foreground"
                 >
-                  {item.status === 3 ? (
+                  {item.status === 2 || task.status === 3 ? (
                     <RefreshCw className="size-6" />
                   ) : (
                     <Loader2 className="size-6 animate-spin" />
                   )}
                   <p className="break-words">
-                    {item.errorMsg || "正在绘制角色形象…"}
+                    {item.errorMsg ||
+                      (item.status === 2 || task.status === 3
+                        ? "图片生成未完成，请查看错误信息后重试。"
+                        : "正在绘制角色形象…")}
                   </p>
                 </div>
               ),

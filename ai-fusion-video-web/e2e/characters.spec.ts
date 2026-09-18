@@ -111,6 +111,7 @@ test("failed generation explains error without selecting an invalid image", asyn
   await createRole(page);
   await page.getByRole("button", { name: "生成角色图片" }).click();
   await expect(page.getByText("模型余额不足").first()).toBeVisible();
+  await expect(page.getByText("正在绘制角色形象…")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "设为角色形象" })).toHaveCount(
     0,
   );

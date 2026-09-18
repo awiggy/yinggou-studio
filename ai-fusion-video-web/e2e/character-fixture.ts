@@ -193,7 +193,7 @@ export async function installCharacterFixture(
               {
                 id: 51,
                 taskId: 50,
-                status: 3,
+                status: 0,
                 errorMsg: "模型余额不足",
                 imageUrl: null,
               },
@@ -202,7 +202,7 @@ export async function installCharacterFixture(
               {
                 id: 51,
                 taskId: 50,
-                status: 2,
+                status: 1,
                 imageUrl: "/media/character-test.svg",
                 thumbnailUrl: null,
               },

@@ -49,6 +49,7 @@ export interface ImageGenerationItem {
   thumbnailUrl: string | null;
   width: number | null;
   height: number | null;
+  /** ImageItem: 0 generating, 1 successful, 2 failed (differs from task status). */
   status: number;
   errorMsg: string | null;
 }
