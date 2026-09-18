@@ -30,6 +30,8 @@
 
 参见 [映构部署说明](deploy/yinggou/README.md)。源码由你自己的 GitHub 仓库管理，服务运行在云服务器；无需在个人电脑常驻运行。
 
+小规格服务器优先使用 GitHub Actions 的 `Yinggou deployment bundle`：在 GitHub 构建并检查完整服务后，下载镜像部署包，服务器仅运行 `install-bundle.sh`，无需在服务器编译。详见部署说明的“使用 GitHub 构建包”。
+
 ```bash
 bash deploy/yinggou/init-env.sh
 docker compose --env-file deploy/yinggou/.env -f deploy/yinggou/compose.yaml up -d --build

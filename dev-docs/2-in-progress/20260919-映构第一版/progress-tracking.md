@@ -30,3 +30,16 @@
 - 价格计算器未返回有效金额，不能将未核实金额作为报价。已询问用户月度基础资源预算，后续需要核对实际报价再创建资源。
 - 本次未创建收费资源，未部署函数，未修改现有网关。
 - 文档依据：[镜像部署](https://www.volcengine.com/docs/6662/1206694)（更新于 2026-02-03）、[函数存储选型](https://www.volcengine.com/docs/6662/1356292)（更新于 2025-03-11）。
+
+## GitHub 构建与低内存运行验证
+
+- 用户要求将构建移到 GitHub，并检查本地配置以判断可行性。
+- 本机为 Apple Silicon、16 GB 内存；未安装 Docker/Podman/Colima。项目 Node 工具可用，前端包管理器锁定 pnpm 10.32.1；JDK 21 当前位于临时目录，不作为云端依赖。
+- 本地开发后端指向 localhost:18080；部署仅绑定 127.0.0.1:8080，域名为空；未发现 SSH config。只核对环境变量名称和是否已设置，未输出凭据。
+- 新增 `Yinggou deployment bundle` 工作流、镜像导入安装脚本和 `low-memory.yaml`。前后端及 MySQL/Redis/Nginx 打包为 Linux amd64 镜像归档，服务器运行时无需构建或拉取镜像。
+- [构建运行 35375007733](https://github.com/awiggy/yinggou-studio/actions/runs/35375007733) 已成功，代码提交 `51e070d`；构建、完整服务启动、初始化接口、登录页、FFmpeg 和数据库迁移检查全部通过。
+- 同提交的 [常规 CI 35375007543](https://github.com/awiggy/yinggou-studio/actions/runs/35375007543) 也已通过。
+- 运行容器内存上限合计 3264 MiB（约 3.19 GiB）；这只是容器限额，不是完整服务器实测峰值。4 GB 可作为单人试用候选，尚未验证真实生图、Agent 或视频合成负载，不能据此承诺 2 GB 配置可用。
+- 部署 artifact 约 869 MiB，保留 1 天，下载到本地后可长期保存。归档不含 GitHub 临时测试 `.env`，安装时在服务器生成独立密码。
+- 本地已保存部署包并通过 SHA-256 校验。启动检查后的 Docker 内存快照：后端 382.2 MiB、MySQL 384.1 MiB、前端 36 MiB、Redis 10.06 MiB、Nginx 4.781 MiB，合计约 817 MiB。此为短时采样，不包含操作系统和真实生成任务的峰值。
+- 尚未购买 ECS 或创建收费资源；账户余额与实际套餐价格仍需在下单前核对。GitHub 构建完成不等于云端已上线。
