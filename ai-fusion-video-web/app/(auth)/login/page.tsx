@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { AuthLayout } from "@/components/ui/auth-layout";
+import { AuthLayout } from "@/components/yinggou-auth-layout";
 import { useAuthStore } from "@/lib/store/auth-store";
 
 import { getInitStatus } from "@/lib/api/system-init";
@@ -14,7 +14,7 @@ import { getApiErrorMessage } from "@/lib/api/api-error";
 function LoginContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const redirectUrl = searchParams.get("redirect") || "/dashboard";
+  const redirectUrl = searchParams.get("redirect") || "/studio";
   const login = useAuthStore((s) => s.login);
 
   const isDev = process.env.NODE_ENV === "development";
@@ -205,7 +205,7 @@ function LoginContent() {
 
       {/* 底部信息 */}
       <p className="text-xs text-white/30 pt-8">
-        融光 · AI视频创作平台
+        映构 · AI视频创作平台
       </p>
     </AuthLayout>
   );

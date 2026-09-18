@@ -25,7 +25,7 @@ export function proxy(request: NextRequest) {
 
   // 已认证访问根路径 → 直接跳 dashboard（跳过初始化检测）
   if (token && isRoot) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/studio", request.url));
   }
 
   // 根路径放行（未认证时需要客户端检测初始化状态）
@@ -42,7 +42,7 @@ export function proxy(request: NextRequest) {
 
   // 已认证访问登录页 → 重定向到面板
   if (token && isPublicPath) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/studio", request.url));
   }
 
   return NextResponse.next();

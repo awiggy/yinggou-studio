@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { AuthLayout } from "@/components/ui/auth-layout";
+import { AuthLayout } from "@/components/yinggou-auth-layout";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { setupAdmin } from "@/lib/api/system-init";
 
@@ -92,7 +92,7 @@ export default function SetupPage() {
       showSuccess={showSuccess}
       successTitle="初始化完成"
       successSubtitle="正在进入控制面板"
-      onTransitionComplete={() => router.replace("/dashboard")}
+      onTransitionComplete={() => router.replace("/studio")}
     >
       {/* 标题 */}
       <div className="space-y-2">
@@ -222,7 +222,7 @@ export default function SetupPage() {
 
       {/* 底部信息 */}
       <p className="text-xs text-white/30 pt-4">
-        融光 · 首次启动配置
+        映构 · 首次启动配置
       </p>
     </AuthLayout>
   );

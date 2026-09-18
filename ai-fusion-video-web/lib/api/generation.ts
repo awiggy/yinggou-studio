@@ -107,9 +107,9 @@ export const generationApi = {
     http.get<never, ImageGenerationTask>(`/api/generation/image/${encodeURIComponent(taskId)}`),
   listImageItems: (taskId: number) =>
     http.get<never, ImageGenerationItem[]>(`/api/generation/image/${taskId}/items`),
-  pageImageTasks: (pageNo = 1, pageSize = 10) =>
+  pageImageTasks: (pageNo = 1, pageSize = 10, filter?: { projectId: number; category: string }) =>
     http.get<never, PageResult<ImageGenerationTask>>(
-      `/api/generation/image/page?pageNo=${pageNo}&pageSize=${pageSize}`,
+      `/api/generation/image/page?pageNo=${pageNo}&pageSize=${pageSize}${filter ? `&projectId=${filter.projectId}&category=${encodeURIComponent(filter.category)}` : ""}`,
     ),
   cancelImage: (taskId: string) =>
     http.post<never, boolean>(`/api/generation/image/${encodeURIComponent(taskId)}/cancel`),

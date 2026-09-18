@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { AuthLayout } from "@/components/ui/auth-layout";
+import { AuthLayout } from "@/components/yinggou-auth-layout";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { getInitStatus } from "@/lib/api/system-init";
 import { getApiErrorMessage } from "@/lib/api/api-error";
@@ -133,7 +133,7 @@ export default function RegisterPage() {
       showSuccess={showSuccess}
       successTitle="注册成功"
       successSubtitle="正在进入控制面板"
-      onTransitionComplete={() => router.replace("/dashboard")}
+      onTransitionComplete={() => router.replace("/studio")}
     >
       <div className="space-y-2">
         <h1 className="text-[2rem] font-bold leading-[1.1] tracking-tight text-white">
@@ -258,7 +258,7 @@ export default function RegisterPage() {
         </Link>
       </p>
 
-      <p className="text-xs text-white/30 pt-4">融光 · 公开注册</p>
+      <p className="text-xs text-white/30 pt-4">映构 · 公开注册</p>
     </AuthLayout>
   );
 }

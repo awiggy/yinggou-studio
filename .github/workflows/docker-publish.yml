@@ -11,6 +11,7 @@ env:
 
 jobs:
   build-and-push:
+    if: github.repository == 'Stonewuu/ai-fusion-video'
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { AuthLayout } from "@/components/ui/auth-layout";
+import { AuthLayout } from "@/components/yinggou-auth-layout";
 import { http } from "@/lib/api/client";
 
 function ForgotPasswordContent() {
@@ -336,7 +336,7 @@ function ForgotPasswordContent() {
         </Link>
       </div>
 
-      <p className="text-xs text-white/30 pt-8">融光 · AI视频创作平台</p>
+      <p className="text-xs text-white/30 pt-8">映构 · AI视频创作平台</p>
     </AuthLayout>
   );
 }

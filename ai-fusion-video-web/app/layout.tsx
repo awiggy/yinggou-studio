@@ -24,10 +24,11 @@ const uiFontFamily =
 
 export const metadata: Metadata = {
   title: {
-    template: "%s - 融光",
-    default: "融光",
+    template: "%s - 映构",
+    default: "映构",
   },
-  description: "基于 Agent 的智能视频创作平台",
+  description: "映构：从角色设定、图片创作到分镜与视频的综合创作平台",
+  icons: { icon: "/yinggou-mark.svg", apple: "/yinggou-mark.svg" },
 };
 
 export default function RootLayout({

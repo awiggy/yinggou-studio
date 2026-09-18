@@ -28,8 +28,8 @@ import { cn } from "@/lib/utils";
 const menuItems = [
   {
     icon: LayoutDashboard,
-    label: "仪表盘",
-    href: "/dashboard",
+    label: "创作",
+    href: "/studio",
     gradient:
       "radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(37,99,235,0.06) 50%, rgba(29,78,216,0) 85%, rgba(29,78,216,0) 100%)",
     iconColor: "text-blue-500",
@@ -70,6 +70,7 @@ const menuItems = [
 
 // 路由与菜单标签的映射关系
 const routeToLabel: Record<string, string> = {
+  "/studio": "创作",
   "/dashboard": "仪表盘",
   "/projects": "项目",
   "/assets": "资产",
@@ -200,15 +201,15 @@ export function AppHeader() {
         leftContent={
           <div
             className="flex items-center cursor-pointer shrink-0"
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/studio")}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo.png"
-              alt="融光"
+              src="/yinggou-mark.svg"
+              alt="映构"
               className="h-8 w-auto ml-2 rounded-lg"
             />
-            <span className="ml-2 text-lg font-bold text-foreground">融光</span>
+            <span className="ml-2 text-lg font-bold text-foreground">映构</span>
           </div>
         }
         mobileControls={
@@ -286,7 +287,7 @@ export function AppHeader() {
             </ClientErrorBoundary>
 
             <a
-              href="https://github.com/Stonewuu/ai-fusion-video"
+              href="https://github.com/awiggy/yinggou-studio"
               target="_blank"
               rel="noreferrer"
               className={cn(

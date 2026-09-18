@@ -45,6 +45,7 @@ const projectListItems: SidebarItem[] = [
 ];
 
 const projectDetailItems: SidebarItem[] = [
+  { key: "characters", label: "角色创作", icon: Users, href: "/characters", iconColor: "text-cyan-400" },
   { key: "", label: "概览", icon: LayoutDashboard, href: "", iconColor: "text-blue-400" },
   { key: "scripts", label: "剧本", icon: BookOpen, href: "/scripts", iconColor: "text-purple-400" },
   { key: "storyboards", label: "分镜", icon: Film, href: "/storyboards", iconColor: "text-cyan-400" },
@@ -149,6 +150,12 @@ export function SidebarNav({
       router.push("/projects");
       onNavigate?.();
     };
+  } else if (pathname.startsWith("/studio")) {
+    sectionTitle = "映构创作";
+    items = [
+      { key: "studio", label: "创作工作台", icon: Film, href: "/studio", iconColor: "text-cyan-400" },
+      ...dashboardItems,
+    ];
   } else if (pathname.startsWith("/dashboard")) {
     sectionTitle = "仪表盘";
     items = dashboardItems;

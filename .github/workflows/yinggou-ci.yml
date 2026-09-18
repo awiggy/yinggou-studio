@@ -1,0 +1,68 @@
+name: Yinggou checks
+
+on:
+  push:
+    branches: [main, feat/yinggou-v1]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yinggou-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: ai-fusion-video-web/pnpm-lock.yaml
+      - name: Install
+        working-directory: ai-fusion-video-web
+        run: pnpm install --frozen-lockfile
+      - name: Lint and profile tests
+        working-directory: ai-fusion-video-web
+        run: |
+          pnpm lint
+          pnpm test:profile
+      - name: Build
+        working-directory: ai-fusion-video-web
+        run: pnpm build
+      - name: Browser checks
+        working-directory: ai-fusion-video-web
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          pnpm test:characters
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-checks
+          path: ai-fusion-video-web/test-results
+          retention-days: 7
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: ai-fusion-video/pom.xml
+      - name: Compile and test image history scoping
+        working-directory: ai-fusion-video
+        run: bash ./mvnw -B -Dtest=CharacterImageHistoryTests package
+      - name: Validate cloud deployment configuration
+        run: |
+          bash deploy/yinggou/init-env.sh
+          docker compose --env-file deploy/yinggou/.env -f deploy/yinggou/compose.yaml config --quiet
+          DOMAIN=video.example.com docker compose --env-file deploy/yinggou/.env -f deploy/yinggou/compose.yaml -f deploy/yinggou/https.yaml config --quiet

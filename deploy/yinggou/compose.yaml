@@ -1,0 +1,90 @@
+name: yinggou
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?请先运行 init-env.sh}
+      MYSQL_DATABASE: yinggou
+      MYSQL_USER: yinggou
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?请先运行 init-env.sh}
+      TZ: Asia/Shanghai
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-time-zone=+08:00
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$${MYSQL_ROOT_PASSWORD}" mysqladmin ping -h localhost --silent']
+      interval: 10s
+      timeout: 5s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?请先运行 init-env.sh}
+    command: [sh, -c, 'exec redis-server --appendonly yes --requirepass "$${REDIS_PASSWORD}"']
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [CMD-SHELL, 'REDISCLI_AUTH="$${REDIS_PASSWORD}" redis-cli ping | grep -q PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  backend:
+    build:
+      context: ../../ai-fusion-video
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      APP_TIME_ZONE: Asia/Shanghai
+      MYSQL_SESSION_TIME_ZONE: +08:00
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: yinggou
+      MYSQL_USERNAME: yinggou
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?请先运行 init-env.sh}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?请先运行 init-env.sh}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--Xms256m -Xmx1024m}
+      CORS_ALLOWED_ORIGIN_PATTERNS: ${SITE_ORIGIN:-http://localhost:8080}
+    volumes:
+      - media_data:/app/data/media
+      - agent_workspace_data:/app/data/agent-workspace
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:18080/api/system/init/status]
+      start_period: 90s
+      interval: 15s
+      timeout: 5s
+      retries: 20
+  frontend:
+    build:
+      context: ../../ai-fusion-video-web
+    restart: unless-stopped
+    environment:
+      PUBLIC_API_URL: ""
+    depends_on:
+      backend:
+        condition: service_healthy
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8080}:80"
+    volumes:
+      - ../../docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  mysql_data:
+  redis_data:
+  media_data:
+  agent_workspace_data:

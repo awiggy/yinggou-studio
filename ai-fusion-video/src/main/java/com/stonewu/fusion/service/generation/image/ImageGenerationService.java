@@ -43,9 +43,16 @@ public class ImageGenerationService {
     }
 
     public PageResult<ImageTask> pageByUser(Long userId, int pageNo, int pageSize) {
+        return pageByUser(userId, pageNo, pageSize, null, null);
+    }
+
+    public PageResult<ImageTask> pageByUser(Long userId, int pageNo, int pageSize,
+                                          Long projectId, String category) {
         return PageResult.of(taskMapper.selectPage(new Page<>(pageNo, pageSize),
                 new LambdaQueryWrapper<ImageTask>()
                         .eq(ImageTask::getUserId, userId)
+                        .eq(projectId != null, ImageTask::getProjectId, projectId)
+                        .eq(category != null && !category.isBlank(), ImageTask::getCategory, category)
                         .orderByDesc(ImageTask::getCreateTime)));
     }
 
