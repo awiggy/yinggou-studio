@@ -43,3 +43,19 @@
 - 部署 artifact 约 869 MiB，保留 1 天，下载到本地后可长期保存。归档不含 GitHub 临时测试 `.env`，安装时在服务器生成独立密码。
 - 本地已保存部署包并通过 SHA-256 校验。启动检查后的 Docker 内存快照：后端 382.2 MiB、MySQL 384.1 MiB、前端 36 MiB、Redis 10.06 MiB、Nginx 4.781 MiB，合计约 817 MiB。此为短时采样，不包含操作系统和真实生成任务的峰值。
 - 尚未购买 ECS 或创建收费资源；账户余额与实际套餐价格仍需在下单前核对。GitHub 构建完成不等于云端已上线。
+
+## 本地 ARM64 部署（2026-09-19）
+
+- 用户要求依次完成 Docker 安装、适配本机架构、启动初始化，然后配置图像模型。
+- 已从 Docker 官方下载并安装 Apple Silicon 版 Docker Desktop 4.91.0；Engine 29.8.0、Compose 5.5.1，Linux aarch64 引擎运行正常。
+- 提交 `cdba70a` 将镜像流水线扩展到 amd64/arm64 原生构建；安装脚本检查包架构，支持 macOS 校验和命令。
+- [镜像构建 35380948544](https://github.com/awiggy/yinggou-studio/actions/runs/35380948544) 两个架构均通过五服务启动、Flyway、FFmpeg 与登录页检查；[常规 CI 35380948290](https://github.com/awiggy/yinggou-studio/actions/runs/35380948290) 通过。
+- 用户提供方舟密钥，经官方数据面 `/api/v3/models` 鉴权返回 HTTP 200，并返回 Seedream 模型编号。密钥未写入源码、文档或 GitHub。
+- 当前 CLI 登录账号的 `ListModelActivations` 显示 Seedream 4.0、4.5、5.0 Lite、5.0 Pro 为 `Unavailable`；模型目录响应不代表实际生图授权。未提交生图请求。
+- Seedream 4.5 价格查询为 0.25 元/张，初始免费额度字段为 200/已用 0；仍需开通后确认可使用的额度，不能当作已经到账。
+- ARM64 部署包已下载并通过 SHA-256 校验，实际部署目录为仓库外的 `releases/cdba70a-arm64/`。
+- 本地五服务运行正常，仅发布 `127.0.0.1:8080`；MySQL/Redis/后端端口未发布到宿主机。FFmpeg 8.0.1 可执行，Flyway 首次启动及重启均验证 26 个迁移通过。
+- 管理员 `awiggy` 已初始化；登录凭据仅保存在本机私有配置目录，不进入仓库。已创建「映构本地验收」项目和「示例角色·林川」，配置火山方舟与默认 Seedream 4.5，并发设为 1。
+- 五服务停止再启动后，管理员登录成功，项目、角色、图像模型及接口地址均能按原 ID 读取；持久化验收通过。
+- 浏览器已打开并确认映构登录页。宿主机可直接访问 http://localhost:8080；仓库外有本地启动/停止快捷文件。
+- 重启验收后的瞬时容器内存约 978 MiB，仍非生图负载峰值。真实生图、图片持久化及公网部署尚未验收。
