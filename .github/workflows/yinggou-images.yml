@@ -21,7 +21,15 @@ concurrency:
 jobs:
   build-and-check:
     if: github.repository == 'awiggy/yinggou-studio'
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 35
     env:
       BACKEND_IMAGE: yinggou-backend:${{ github.sha }}
@@ -39,10 +47,10 @@ jobs:
         run: |
           bash ./mvnw -B -Dtest=CharacterImageHistoryTests package
           cp target/ai-fusion-video-1.1.2.jar docker-build/app.jar
-      - name: Build Linux amd64 images
+      - name: Build native Linux images
         run: |
-          docker build --platform linux/amd64 -t "$BACKEND_IMAGE" ai-fusion-video/docker-build
-          docker build --platform linux/amd64 -t "$FRONTEND_IMAGE" ai-fusion-video-web
+          docker build --platform linux/${{ matrix.arch }} -t "$BACKEND_IMAGE" ai-fusion-video/docker-build
+          docker build --platform linux/${{ matrix.arch }} -t "$FRONTEND_IMAGE" ai-fusion-video-web
       - name: Check complete stack with memory limits
         run: |
           bash deploy/yinggou/init-env.sh
@@ -62,12 +70,13 @@ jobs:
           cp docker/nginx/default.conf bundle/docker/nginx/
           printf 'BACKEND_IMAGE=%s\nFRONTEND_IMAGE=%s\n' "$BACKEND_IMAGE" "$FRONTEND_IMAGE" > bundle/images.env
           printf '%s\n' "$GITHUB_SHA" > bundle/COMMIT
+          printf '%s\n' '${{ matrix.arch }}' > bundle/ARCH
           cd bundle
           sha256sum images.tar.gz > SHA256SUMS
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: yinggou-linux-amd64
+          name: yinggou-linux-${{ matrix.arch }}
           path: bundle/
           include-hidden-files: false
           compression-level: 0
